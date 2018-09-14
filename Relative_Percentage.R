@@ -2,7 +2,7 @@
 # Relative Percentage
 #--------------------------------------------------------------------------------------------------------------
 
-load("C:/Users/milanimatteo/progetti/Renzi/Gep1_coll/dataset_GEP1_RSN_f1_coll.RData")
+load() #collapsed eset
 
 #Add an id variable for the filled regions
 library(reshape)
@@ -11,7 +11,9 @@ library(ggplot2)
 library(RColorBrewer)
 library(gridExtra)
 
-
+#Tengo solo i campioni statisticamente significativi
+All_dataset <- read.table("CIBERSORT-Results.txt",sep="\t",header=T,row.names=1)
+All_dataset <- All_dataset[All_dataset$P.value < 0.05,]
 
 datm <- melt(cbind(All_dataset, ind = rownames(All_dataset)), id.vars = c('ind'))
 datm <- datm[!datm$variable%in%c("RMSE","Correlation","P.value"),]
@@ -31,12 +33,14 @@ a <- c("#99CC00","#CCCCCC","#FFCC00","#FF9900","#FF6600",
        "#993300","#996600","#660000","#FF0000","#330000",
        "#6600CC","#0099FF","#00CCFF","#003300","#FF00CC")
 
-Balbc6 <- datm[grep("BALBc_06",datm$samples),]
-Neut6 <- datm[grep("NeuT_06",datm$samples),]
+#Classi biologiche in cui divido i dataset
 
-Balbc6$samples <- dataset.coll$GF_ID[colnames(dataset.coll)%in%gsub("_BALBc_06","",Balbc6$samples)] 
+... wt <- datm[grep("...",datm$samples),]
+... other <- datm[grep("...",datm$samples),]
 
-b6 <- ggplot(Balbc6,aes(x = samples, y = relative.percentage,fill = legend)) + 
+... wt$samples <- dataset.coll$GF_ID[colnames(dataset.coll)%in%gsub("...","",...$samples)] 
+
+b6 <- ggplot(... wt ,aes(x = samples, y = relative.percentage,fill = legend)) + 
   geom_bar(position = "fill",stat = "identity") +
   scale_y_continuous(labels = percent_format()) +
   scale_fill_manual(values=a) +
@@ -45,9 +49,9 @@ b6 <- ggplot(Balbc6,aes(x = samples, y = relative.percentage,fill = legend)) +
   guides(fill=guide_legend(ncol=1))
 
 
-Neut6$samples <- dataset.coll$GF_ID[colnames(dataset.coll)%in%gsub("_NeuT_06","",Neut6$samples)] 
+... other$samples <- dataset.coll$GF_ID[colnames(dataset.coll)%in%gsub("... other","",... other$samples)] 
 
-n6 <- ggplot(Neut6,aes(x = samples, y = relative.percentage,fill = legend)) + 
+n6 <- ggplot(... other,aes(x = samples, y = relative.percentage,fill = legend)) + 
   geom_bar(position = "fill",stat = "identity") +
   scale_y_continuous(labels = percent_format()) +
   scale_fill_manual(values=a) +
@@ -55,10 +59,11 @@ n6 <- ggplot(Neut6,aes(x = samples, y = relative.percentage,fill = legend)) +
   theme(legend.key.size = unit(0.7,"line")) +
   guides(fill=guide_legend(ncol=1))
 
-pdf("Relative_percentage/Balbc_weeks6.pdf")
-print(b6 + ggtitle(label = "Balbc at 6 weeks") + theme(plot.title = element_text(hjust = 0.5)))
+dir.create("Relative_percentage")
+pdf("Relative_percentage/...pdf")
+print(b6 + ggtitle(label = "...") + theme(plot.title = element_text(hjust = 0.5)))
 dev.off()
 
-pdf("Relative_percentage/NeuT_weeks6.pdf")
-print(n6 + ggtitle(label = "NeuT at 6 weeks") + theme(plot.title = element_text(hjust = 0.5)))
+pdf("Relative_percentage/...pdf")
+print(n6 + ggtitle(label = "...") + theme(plot.title = element_text(hjust = 0.5)))
 dev.off()
