@@ -24,7 +24,6 @@ datm$ind <- temp
 
 colnames(datm) <- c("legend","samples","relative.percentage")
 
-
 a <- c(brewer.pal(9,"Set1"),brewer.pal(7,"PuOr"),brewer.pal(11,"Spectral"))
 
 a <- c("#99CC00","#CCCCCC","#FFCC00","#FF9900","#FF6600",
@@ -33,37 +32,30 @@ a <- c("#99CC00","#CCCCCC","#FFCC00","#FF9900","#FF6600",
        "#993300","#996600","#660000","#FF0000","#330000",
        "#6600CC","#0099FF","#00CCFF","#003300","#FF00CC")
 
-#Classi biologiche in cui divido i dataset
+#Classe biologica
+Weeks6 <- datm[grep("BALBc_06|NeuT_06",datm$samples),]
+Weeks6$gruppi <- substr(Weeks6$samples,14,nchar(as.character(unlist(Weeks6$samples))))
 
-... wt <- datm[grep("...",datm$samples),]
-... other <- datm[grep("...",datm$samples),]
+matrx <- rep(NA,length(Weeks6$samples))
+samp <- gsub("_NeuT_06|_BALBc_06","",unique(Weeks6$samples))
 
-... wt$samples <- dataset.coll$GF_ID[colnames(dataset.coll)%in%gsub("...","",...$samples)] 
+for ( i in samp)
+{
+  matrx[substr(Weeks6$samples,1,12)%in%i] <-  as.character(unlist(dataset.coll$GF_ID[colnames(dataset.coll)%in%i]))
+}
 
-b6 <- ggplot(... wt ,aes(x = samples, y = relative.percentage,fill = legend)) + 
+Weeks6$samples <- matrx
+
+b6 <- ggplot(Weeks6,aes(x = samples, y = relative.percentage,fill = legend)) + 
   geom_bar(position = "fill",stat = "identity") +
   scale_y_continuous(labels = percent_format()) +
   scale_fill_manual(values=a) +
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) +
   theme(legend.key.size = unit(0.7,"line")) +
-  guides(fill=guide_legend(ncol=1))
-
-
-... other$samples <- dataset.coll$GF_ID[colnames(dataset.coll)%in%gsub("... other","",... other$samples)] 
-
-n6 <- ggplot(... other,aes(x = samples, y = relative.percentage,fill = legend)) + 
-  geom_bar(position = "fill",stat = "identity") +
-  scale_y_continuous(labels = percent_format()) +
-  scale_fill_manual(values=a) +
-  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) +
-  theme(legend.key.size = unit(0.7,"line")) +
-  guides(fill=guide_legend(ncol=1))
+  guides(fill=guide_legend(ncol=1)) +
+  facet_grid(~Weeks6$gruppi,scales='free')
 
 dir.create("Relative_percentage")
-pdf("Relative_percentage/...pdf")
-print(b6 + ggtitle(label = "...") + theme(plot.title = element_text(hjust = 0.5)))
-dev.off()
-
-pdf("Relative_percentage/...pdf")
-print(n6 + ggtitle(label = "...") + theme(plot.title = element_text(hjust = 0.5)))
+pdf("Relative_percentage/weeks6.pdf")
+print(b6)
 dev.off()
